@@ -1,14 +1,14 @@
-const kertasPanjang = document.getElementById('kertas_panjang');
-const kertasLebar = document.getElementById('kertas_lebar');
-const filePanjang = document.getElementById('file_panjang');
-const fileLebar = document.getElementById('file_lebar');
+const kertasWidth = document.getElementById('kertas_width');
+const kertasHeight = document.getElementById('kertas_height');
+const fileSisi1 = document.getElementById('file_sisi_1');
+const fileSisi2 = document.getElementById('file_sisi_2');
 const tombolSubmit = document.getElementById('tombol_submit');
 
-const kertasPanjangSpan = document.getElementById('kertas_panjang_span');
-const kertasLebarSpan = document.getElementById('kertas_lebar_span');
-const cardLayout = document.getElementById('card_layout');
+const kertasWidthSpan = document.getElementById('kertas_width_span');
+const kertasHeightSpan = document.getElementById('kertas_height_span');
+const cardLayoutBest = document.getElementById('card_layout_best');
 
-const form = [kertasPanjang, kertasLebar, filePanjang, fileLebar];
+const form = [kertasWidth, kertasHeight, fileSisi1, fileSisi2];
 
 // Fungsi menonaktifkan button submit jika input belum terisi semua
 function toggleButtonClassDisabled(element) {
@@ -33,67 +33,189 @@ function layout(kertas, file) {
     return result;
 }
 
+// Fungsi menghitung layout
+function layout(k1, k2, s1, s2) {
+    let jumlahItemW = [], jumlahItemH = [];
+    let kertasSisa = 0;
+
+    let i = 1;
+    while(s1 * i <= k1) { let k = 1;
+        while(s2 * k <= k2) { k++; }
+        let j = 1;
+        kertasSisa = k1 - s1 * i;
+        jumlahItemW[i-1] = [i, 0], jumlahItemH[i-1] = [k-1, 0];
+        while(s2 * j <= kertasSisa) { let l = 1;
+            while(s1 * l <= k2) { l++; }
+            jumlahItemH[i-1] = [k-1, l-1];
+            j++;
+        }
+        jumlahItemW[i-1] = [i, j-1];
+        i++;
+    }
+
+    let result = [], layoutObj = {};
+    for (let i=0; i<jumlahItemH.length; i++) {
+        const ukLayW = (jumlahItemW[i][0]*s1) + (jumlahItemW[i][1]*s2);
+        const ukLayH = jumlahItemH[i][0]*s2 > jumlahItemH[i][1]*s1 ? jumlahItemH[i][0]*s2 : jumlahItemH[i][1]*s1;
+        layoutObj = {
+            itemW : jumlahItemW[i],
+            itemH : jumlahItemH[i],
+            ukLay : [ukLayW, ukLayH],
+            sisa : [k1 - ukLayW, k2 - ukLayH],
+            itemJumlah : (jumlahItemW[i][0]*jumlahItemH[i][0]) + (jumlahItemW[i][1]*jumlahItemH[i][1]),
+            kertas : [k1, k2],
+            sisi : [s1, s2]
+        };
+        result[i] = layoutObj;
+    }
+    return result;
+}
+
+// Fungsi menggambar layout
+function layoutGambar(lay) {
+    const sisaWidth = Math.floor(lay.sisa[0]/2*100/lay.kertas[0]*10)/10;
+    const sisaHeight = Math.floor(lay.sisa[1]/2*100/lay.kertas[1]*10)/10;
+    const itemWidth_s1 = Math.floor(lay.sisi[0]*100/lay.kertas[0]*10)/10;
+    const itemHeight_s1 = Math.floor(lay.sisi[1]*100/lay.kertas[1]*10)/10;
+    const itemWidth_s2 = Math.floor(lay.sisi[0]*100/lay.kertas[1]*10)/10;
+    const itemHeight_s2 = Math.floor(lay.sisi[1]*100/lay.kertas[0]*10)/10;
+
+    let gambar = '';
+    if (lay.kertas[0] > lay.kertas[1]) {
+        let garisHeight = 0, garisWidth = 0, garisLeft = sisaWidth;
+        for (let i=0; i<lay.itemW[0]+lay.itemW[1]; i++) {
+            garisTop = sisaHeight;
+            if (i < lay.itemW[0]) {
+                garisWidth = itemWidth_s1, garisHeight = itemHeight_s1;
+                for (let j=0; j<lay.itemH[0]; j++) {
+                    gambar += `<div style="position: absolute; border: 1px solid #000; width:${garisWidth}%; height:${garisHeight}%; top: ${garisTop}%; left: ${garisLeft}%;"></div>`;
+                    garisTop += itemHeight_s1;
+                }
+            } else {
+                garisWidth = itemHeight_s2, garisHeight = itemWidth_s2;
+                for (let j=0; j<lay.itemH[1]; j++) {
+                    gambar += `<div style="position: absolute; border: 1px solid #000; width:${garisWidth}%; height:${garisHeight}%; top: ${garisTop}%; left: ${garisLeft}%;"></div>`;
+                    garisTop += itemWidth_s2;
+                }
+            }
+            garisLeft += garisWidth;
+        }
+    } else {
+        let garisHeight = 0, garisWidth = 0, garisTop = sisaWidth;
+        for (let i=0; i<lay.itemW[0]+lay.itemW[1]; i++) {
+            garisLeft = sisaHeight;
+            if (i < lay.itemW[0]) {
+                garisWidth = itemHeight_s1, garisHeight = itemWidth_s1;
+                for (let j=0; j<lay.itemH[0]; j++) {
+                    gambar += `<div style="position: absolute; border: 1px solid #000; width:${garisWidth}%; height:${garisHeight}%; top: ${garisTop}%; left: ${garisLeft}%;"></div>`;
+                    garisLeft += itemHeight_s1;
+                }
+            } else {
+                garisWidth = itemWidth_s2, garisHeight = itemHeight_s2;
+                for (let j=0; j<lay.itemH[1]; j++) {
+                    gambar += `<div style="position: absolute; border: 1px solid #000; width:${garisWidth}%; height:${garisHeight}%; top: ${garisTop}%; left: ${garisLeft}%;"></div>`;
+                    garisLeft += itemWidth_s2;
+                }
+            }
+            garisTop += garisHeight;
+        }
+    }
+    return gambar;
+}
+
 tombolSubmit.addEventListener('click', function() {
     // Mengambil nilai dari form input
-    const kertasPanjangValue = kertasPanjang.value;
-    const kertasLebarValue = kertasLebar.value;
-    const filePanjangValue = filePanjang.value;
-    const fileLebarValue = fileLebar.value;
+    const kertasWidthValue = kertasWidth.value;
+    const kertasHeightValue = kertasHeight.value;
+    const fileSisi1Value = fileSisi1.value;
+    const fileSisi2Value = fileSisi2.value;
 
-    // Memanggil fungsi layout
-    const layPanjang = layout(kertasPanjangValue, filePanjangValue)
-    const layLebar = layout(kertasLebarValue, fileLebarValue)
-
+    const layoutFix = [...layout(kertasWidthValue, kertasHeightValue, fileSisi1Value, fileSisi2Value), ...layout(kertasHeightValue, kertasWidthValue, fileSisi1Value, fileSisi2Value)];
+    layoutFix.sort((a, b) => {
+        return b.itemJumlah - a.itemJumlah;
+    });
+    console.log(layoutFix);
+    cardLayoutBest.innerHTML = layoutGambar(layoutFix[0]);
     // Menampilkan detail informasi layout
     const tableTr = document.querySelectorAll('tr');
-    const tableValue = [layPanjang[1]+' mm', layLebar[1]+' mm', layPanjang[2]+' mm', layLebar[2]+' mm', (layPanjang[0]*layLebar[0])+' biji'];
-    kertasPanjangSpan.innerHTML = kertasPanjangValue+' mm';
-    kertasLebarSpan.innerHTML = kertasLebarValue+' mm';
+    const tableValue = [layoutFix[0].ukLay[1]+' mm', layoutFix[0].ukLay[0]+' mm', layoutFix[0].sisa[0]+' mm', layoutFix[0].sisa[1]+' mm', layoutFix[0].itemJumlah+' biji'];
+    kertasWidthSpan.innerHTML = layoutFix[0].kertas[0]+' mm';
+    kertasHeightSpan.innerHTML = layoutFix[0].kertas[1]+' mm';
     tableTr.forEach((element, index) => {
         element.childNodes[5].innerHTML = tableValue[index];
     });
 
-    // Menampilkan visual layout
-    let hasilLayout = '';
-    const sisaPanjang = Math.floor(layPanjang[2]/2*100/kertasPanjangValue*10)/10;
-    const itemPanjang = Math.floor(filePanjangValue*100/kertasPanjangValue*10)/10;
-    const sisaLebar = Math.floor(layLebar[2]/2*100/kertasLebarValue*10)/10;
-    const itemLebar = Math.floor(fileLebarValue*100/kertasLebarValue*10)/10;
-    
-    let panjang = 0;
-    let lebar = 0;
-    let jarakAtas = 0;
-
-    for (let i=0; i<(layPanjang[0]+2); i++) {
-        let jarakKiri = 0;
-        if (i==0) {
-            jarakAtas = 0;
-            panjang = sisaPanjang;
-        } else if (i==1) {
-            jarakAtas += sisaPanjang;
-            panjang = itemPanjang;
-        } else if (i==layPanjang[0]+1) {
-            jarakAtas += itemPanjang;
-            panjang = sisaPanjang;
-        } else {
-            jarakAtas +=itemPanjang;
-            panjang = itemPanjang;
-        }
-        for (let j=0; j<(layLebar[0]+2); j++) {
-            if (j==0 || j==layLebar[0]+1) {
-                lebar = sisaLebar;
-                hasilLayout += `<div style="width: ${lebar}%; height: ${panjang}%; position: absolute; top: ${Math.floor(jarakAtas*10)/10}%; left: ${jarakKiri}%;"></div>`;
-                jarakKiri += sisaLebar;
-                console.log(Math.floor(jarakAtas*10)/10);
-            } else {
-                lebar = itemLebar;
-                let border = i==0 || i==layPanjang[0]+1 ? '' : 'border: 1px solid gray;';
-                hasilLayout += `<div style="width: ${lebar}%; height: ${panjang}%; position: absolute; top: ${Math.floor(jarakAtas*10)/10}%; left: ${jarakKiri}%; ${border}"></div>`;
-                jarakKiri += itemLebar;
-                console.log(Math.floor(jarakAtas*10)/10);
-            }
-        }
-    }
-    
-    cardLayout.innerHTML = hasilLayout;
+    const tombolLayoutOther = document.getElementById('tombol_layout_other');
+    tombolLayoutOther.classList.remove('d-none');
+    tombolLayoutOther.addEventListener('click', function() {
+        const cardLayoutOther = document.getElementById('card_layout_other');
+        let layoutLainnya = '';
+        layoutFix.forEach(val => {
+            layoutLainnya += `
+                <div class="card shadow my-2">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="offset-2">
+                                    <p class="m-0">Height</p>
+                                    <div class="arrow left"></div>
+                                    <p class="line-text-hr"><span>${val.kertas[0]} mm</span></p>
+                                    <div class="arrow right"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-1">
+                                        <p style="width:1px; word-wrap: break-word;">Width</p>
+                                    </div>
+                                    <div class="col-1">
+                                        <div class="arrow up"></div>
+                                        <div class="line-text-vr"><span>${val.kertas[1]} mm</span></div>
+                                        <div class="arrow down"></div>
+                                    </div>
+                                    <div class="col-10">
+                                        <div class="card my-3">
+                                            <div class="card-body bg-light p-0" style="height: 200px;">
+                                                <div class="w-100 h-100 p-0">
+                                                    ${layoutGambar(val)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <table class="table text-left mt-4">
+                                    <tr>
+                                        <td class="p-2">Ukuran Layout Width</td>
+                                        <td class="p-2">:</td>
+                                        <td class="p-2">${val.ukLay[0]} mm</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">Ukuran Layout Height</td>
+                                        <td class="p-2">:</td>
+                                        <td class="p-2">${val.ukLay[1]} mm</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">Ukuran Sisa Width</td>
+                                        <td class="p-2">:</td>
+                                        <td class="p-2">${val.sisa[0]} mm</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">Ukuran Sisa Height</td>
+                                        <td class="p-2">:</td>
+                                        <td class="p-2">${val.sisa[1]} mm</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2">1 Layout Isi</td>
+                                        <td class="p-2">:</td>
+                                        <td class="p-2">${val.itemJumlah} Biji</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        cardLayoutOther.innerHTML = layoutLainnya;
+    });
 });

@@ -9,43 +9,39 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="col text-center mt-4">
-            <h1>Layout Media Cetak</h1>
+        <div class="col text-center mt-4 mb-5">
+            <h1 class="display-4">Layout Media Cetak</h1>
             <!-- FORM -->
             <div class="row my-5">
                 <div class="col-md-6">
-                    <div class="card shadow p-2">
+                    <div class="card shadow p-2 h-100">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group text-left">
-                                        <label for="kertas_panjang">Panjang Kertas :</label>
-                                        <input type="number" class="form-control" name="kertas_panjang" id="kertas_panjang">
-                                        <small class="form-text text-muted">Panjang dari kertas untuk layout</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group text-left">
-                                        <label for="kertas_lebar">Lebar Kertas :</label>
-                                        <input type="number" class="form-control" name="kertas_lebar" id="kertas_lebar">
-                                        <small class="form-text text-muted">Lebar dari kertas untuk layout</small>
-                                    </div>
+                            <div class="col">
+                                <div class="form-group text-left">
+                                    <label for="kertas_width">Kertas Width :</label>
+                                    <input type="number" class="form-control" name="kertas_width" id="kertas_width">
+                                    <small class="form-text text-muted">Width dari kertas untuk layout</small>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group text-left">
-                                        <label for="file_panjang">Panjang File :</label>
-                                        <input type="number" class="form-control" name="file_panjang" id="file_panjang">
-                                        <small class="form-text text-muted">Panjang dari file untuk layout</small>
-                                    </div>
+                            <div class="col">
+                                <div class="form-group text-left">
+                                    <label for="kertas_height">Kertas Height :</label>
+                                    <input type="number" class="form-control" name="kertas_height" id="kertas_height">
+                                    <small class="form-text text-muted">Height dari kertas untuk layout</small>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group text-left">
-                                        <label for="file_lebar">Lebar File :</label>
-                                        <input type="number" class="form-control" name="file_lebar" id="file_lebar">
-                                        <small class="form-text text-muted">Lebar dari file untuk layout</small>
-                                    </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group text-left">
+                                    <label for="file_sisi_1">File Sisi 1:</label>
+                                    <input type="number" class="form-control" name="file_sisi_1" id="file_sisi_1">
+                                    <small class="form-text text-muted">Sisi 1 dari file untuk layout</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group text-left">
+                                    <label for="file_sisi_2">File Sisi 2 :</label>
+                                    <input type="number" class="form-control" name="file_sisi_2" id="file_sisi_2">
+                                    <small class="form-text text-muted">Sisi 2 dari file untuk layout</small>
                                 </div>
                             </div>
                             <button class="btn btn-block btn-primary" disabled id="tombol_submit">Submit</button>
@@ -56,24 +52,26 @@
                 <div class="col-md-6 mt-xl-0 mt-lg-0 mt-md-0 mt-sm-5 mt-5">
                     <div class="card shadow p-2">
                         <div class="card-body"> 
-                            <p class="m-0">Lebar</p>
-                            <div class="arrow left"></div>
-                            <p class="line-text-hr"><span id="kertas_lebar_span">- mm</span></p>
-                            <div class="arrow right"></div>
+                            <div class="offset-2">
+                                <p class="m-0">Width</p>
+                                <div class="arrow left"></div>
+                                <p class="line-text-hr"><span id="kertas_width_span">- mm</span></p>
+                                <div class="arrow right"></div>
+                            </div>
                             <div class="row">
                                 <div class="col-1">
-                                    <p style="width:1px; word-wrap: break-word;">Panjang</p>
+                                    <p style="width:1px; word-wrap: break-word;">Height</p>
                                 </div>
                                 <div class="col-1">
                                     <div class="arrow up"></div>
-                                    <div class="line-text-vr"><span id="kertas_panjang_span">- mm</span></div>
+                                    <div class="line-text-vr"><span id="kertas_height_span">- mm</span></div>
                                     <div class="arrow down"></div>
                                 </div>
                                 <div class="col-10">
                                     <div class="card my-3">
                                         <div class="card-body bg-light p-0" style="height: 200px;">
-                                            <div class="w-100 h-100 p-0" id="card_layout">
-                                                <!-- LAYOUT -->
+                                            <div class="w-100 h-100 p-0" id="card_layout_best">
+                                                <!-- Gambar layout terbaik -->
                                             </div>
                                         </div>
                                     </div>
@@ -81,22 +79,22 @@
                             </div>
                             <table class="table text-left mt-4">
                                 <tr>
-                                    <td class="p-2">Ukuran Layout Panjang</td>
+                                    <td class="p-2">Ukuran Layout Width</td>
                                     <td class="p-2">:</td>
                                     <td class="p-2">- mm</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Ukuran Layout Lebar</td>
+                                    <td class="p-2">Ukuran Layout Height</td>
                                     <td class="p-2">:</td>
                                     <td class="p-2">- mm</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Ukuran Sisa Panjang</td>
+                                    <td class="p-2">Ukuran Sisa Height</td>
                                     <td class="p-2">:</td>
                                     <td class="p-2">- mm</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-2">Ukuran Sisa Lebar</td>
+                                    <td class="p-2">Ukuran Sisa Width</td>
                                     <td class="p-2">:</td>
                                     <td class="p-2">- mm</td>
                                 </tr>
@@ -109,6 +107,11 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <button class="btn btn-primary d-none" id="tombol_layout_other">Lihat layout lainnya</button>
+            <div class="col mt-4" id="card_layout_other">
+                <!-- Gambar layout lain -->
+                
             </div>
         </div>
     </div>
